@@ -1,6 +1,6 @@
 ## Dusk Engine ##
 
-The Dusk Engine (concept version named CoronaTiled; pre-beta named Ceramic Tile Engine) is to be a fully featured game engine for [Corona SDK](http://www.coronalabs.com). It's designed to help you "weed out" extra code for level creation and let you focus on the game mechanics, instead of the level makeup.  
+The Dusk Engine (concept version named CoronaTiled; pre-beta named Ceramic Tile Engine) is a fully featured game engine for [Corona SDK](http://www.coronalabs.com). It's designed to help you "weed out" extra code for level creation and let you focus on the game mechanics, instead of the level makeup.  
 
 It's written on a powerful base, but interfaced with simple, intuitive commands that are easy to learn (when they even exist!). Adding Dusk to your project barely makes a ripple on your code. You can keep all the normal Corona function calls you're used to: `map:scale()`, `layer:insert()`, and the such; you don't have to use separate engine functions to do normal task. Dusk is meant to incorporate seamlessly into your project's flow.
 
