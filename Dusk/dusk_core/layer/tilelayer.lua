@@ -51,15 +51,18 @@ function tilelayer.createLayer(mapData, data, dataIndex, tileIndex, imageSheets,
 	local twindex = lib_twindex.buildTwindex(lib_settings.get("enableTwindex"))
 	twindex.loadMatrix(mapData.width, mapData.height, data.data)
 
-	layer._tile = {}
 	layer.props = {}
+	local layerTiles = {}
+	local locked = {}
 
-	function layer.tile(x, y) if layer._tile[x] ~= nil and layer._tile[x][y] ~= nil then return layer._tile[x][y] else return nil end end
+	function layer.tile(x, y) if layerTiles[x] ~= nil and layerTiles[x][y] ~= nil then return layerTiles[x][y] else return nil end end
 
 	------------------------------------------------------------------------------
 	-- Draw a Single Tile to the Screen
 	------------------------------------------------------------------------------
 	function layer._drawTile(x, y)
+		if locked[x] and locked[x][y] == "e" then return false end
+
 		tprint.add("Draw Tile (" .. layerName .. ")")
 		
 		if layer.tile(x, y) == nil then
@@ -120,8 +123,8 @@ function tilelayer.createLayer(mapData, data, dataIndex, tileIndex, imageSheets,
 			addProperties(tileProps, "props", tile.props)
 
 			tile.tileX, tile.tileY = x, y
-			if not layer._tile[x] then layer._tile[x] = {} end
-			layer._tile[x][y] = tile
+			if not layerTiles[x] then layerTiles[x] = {} end
+			layerTiles[x][y] = tile
 			layer:insert(tile)
 			tile:toBack()
 		elseif lib_settings.get("redrawOnTileExistent") then
@@ -136,12 +139,14 @@ function tilelayer.createLayer(mapData, data, dataIndex, tileIndex, imageSheets,
 	-- Erase a Single Tile from the Screen
 	------------------------------------------------------------------------------
 	function layer._eraseTile(x, y)
-		if layer.tile(x, y) then
-			display_remove(layer._tile[x][y])
-			layer._tile[x][y] = nil
+		if locked[x] and locked[x][y] == "d" then return false end
 
-			if table_maxn(layer._tile[x]) == 0 then
-				layer._tile[x] = nil -- Clear row if no tiles in the row
+		if layer.tile(x, y) then
+			display_remove(layerTiles[x][y])
+			layerTiles[x][y] = nil
+
+			if table_maxn(layerTiles[x]) == 0 then
+				layerTiles[x] = nil -- Clear row if no tiles in the row
 			end
 		end
 	end
@@ -153,6 +158,13 @@ function tilelayer.createLayer(mapData, data, dataIndex, tileIndex, imageSheets,
 		layer._eraseTile(x, y)
 		layer._drawTile(x, y)
 	end
+
+	------------------------------------------------------------------------------
+	-- Lock a Tile
+	------------------------------------------------------------------------------
+	function layer._lockTileDrawn(x, y) if not locked[x] then locked[x] = {} end locked[x][y] = "d" layer._drawTile(x, y) end
+	function layer._lockTileErased(x, y) if not locked[x] then locked[x] = {} end locked[x][y] = "e" layer._eraseTile(x, y) end
+	function layer._unlockTile(x, y) if locked[x] and locked[x][y] then locked[x][y] = nil if table_maxn(locked[x]) == 0 then locked[x] = nil end end end
 
 	------------------------------------------------------------------------------
 	-- Edit Section
@@ -178,8 +190,7 @@ function tilelayer.createLayer(mapData, data, dataIndex, tileIndex, imageSheets,
 		if distY > distX then func = "seekY" end
 
 		-- Function associated with edit mode
-		local layerFunc = "_eraseTile"
-		if mode == "d" then layerFunc = "_drawTile" end
+		local layerFunc = "_eraseTile" if mode == "d" then layerFunc = "_drawTile" elseif mode == "ld" then layerFunc = "_lockTileDrawn" elseif mode == "le" then layerFunc = "_lockTileErased" elseif mode == "u" then layerFunc = "_unlockTile" end
 
 		if func == "seekX" then
 			for x = x1, x2 do
@@ -204,6 +215,19 @@ function tilelayer.createLayer(mapData, data, dataIndex, tileIndex, imageSheets,
 	------------------------------------------------------------------------------
 	function layer.erase(x1, x2, y1, y2)
 		return layer._edit(x1, x2, y1, y2, "e")
+	end
+
+	------------------------------------------------------------------------------
+	-- Lock Section (shortcut)
+	------------------------------------------------------------------------------
+	function layer.lock(x1, y1, x2, y2, mode)
+		if mode == "draw" or mode == "d" then
+			return layer._edit(x1, x2, y1, y2, "ld")
+		elseif mode == "erase" or mode == "e" then
+			return layer._edit(x1, x2, y1, y2, "le")
+		elseif mode == "unlock" or mode == "u" then
+			return layer._edit(x1, x2, y1, y2, "u")
+		end
 	end
 
 	------------------------------------------------------------------------------
