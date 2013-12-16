@@ -160,7 +160,7 @@ function tilelayer.createLayer(mapData, data, dataIndex, tileIndex, imageSheets,
 	end
 
 	------------------------------------------------------------------------------
-	-- Lock a Tile
+	-- Lock/Unlock a Tile
 	------------------------------------------------------------------------------
 	function layer._lockTileDrawn(x, y) if not locked[x] then locked[x] = {} end locked[x][y] = "d" layer._drawTile(x, y) end
 	function layer._lockTileErased(x, y) if not locked[x] then locked[x] = {} end locked[x][y] = "e" layer._eraseTile(x, y) end

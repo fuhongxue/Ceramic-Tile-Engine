@@ -94,8 +94,8 @@ function lib_camera.addControl(map)
 				local layerX = camera.layer[i].x
 				local layerY = camera.layer[i].y
 
-				local viewX = camera.viewX* map.layer[i].xParallax
-				local viewY = camera.viewY* map.layer[i].xParallax
+				local viewX = camera.viewX * map.layer[i].xParallax
+				local viewY = camera.viewY * map.layer[i].yParallax
 
 				local diffX = (-viewX - layerX)
 				local diffY = (-viewY - layerY)
