@@ -38,7 +38,7 @@ local getXY = lib_functions.getXY
 function core.buildMap(filename, base)
 	local f1, f2 = filename:find("/?([^/]+%..+)$")
 	local actualFileName = filename:sub(f1 + 1, f2)
-	local dirTree = {}; for dir in filename:sub(1, f1):gmatch(".-/") do table_insert(dirTree, dir) end
+	local dirTree = {}; for dir in filename:sub(1, f1):gmatch("(.-)/") do table_insert(dirTree, dir) end
 
 	-- Load other things
 	tprint.add("Load Data"); local data = lib_data.get(filename, base); tprint.remove()

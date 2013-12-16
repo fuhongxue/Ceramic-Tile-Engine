@@ -61,7 +61,7 @@ function lib_tileset.get(data, dirTree)
 				count = 0
 			},
 
-			image = directoryPath .. filename,
+			image = directoryPath .. "/" .. filename,
 			margin = data.tilesets[i].margin,
 			spacing = data.tilesets[i].spacing,
 			tileheight = data.tilesets[i].tileheight,
@@ -69,7 +69,7 @@ function lib_tileset.get(data, dirTree)
 			tilesetWidth = 0,
 			tilesetHeight = 0,
 		}
-		
+
 		-- Remove opening slash, if existent
 		if options.image:sub(1,1) == "/" or options.image:sub(1,1) == "\\" then options.image = options.image:sub(2) end
 		
