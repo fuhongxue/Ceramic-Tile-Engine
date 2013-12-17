@@ -135,9 +135,9 @@ function core.buildMap(filename, base)
 		if map.layer[i]._type == "tile" then
 			table_insert(layerList.tile, i)
 		elseif map.layer[i]._type == "object" then
-			table_insert(layerList.tile, i)
+			table_insert(layerList.object, i)
 		elseif map.layer[i]._type == "image" then
-			table_insert(layerList.tile, i)
+			table_insert(layerList.image, i)
 		end
 	end
 
