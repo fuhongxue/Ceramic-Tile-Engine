@@ -23,4 +23,5 @@ local function alertListener(event)
 	loadDemo()
 end
 
-native.showAlert("Bob", "Welcome to the Dusk demo!\n\nChoose your level.", {"3", "2", "1"}, alertListener)
+alertListener({index = 3})
+--native.showAlert("Bob", "Welcome to the Dusk demo!\n\nChoose your level.", {"3", "2", "1"}, alertListener)

@@ -38,7 +38,13 @@ local spliceTable = lib_functions.spliceTable
 local getProperties = lib_functions.getProperties
 local addProperties = lib_functions.addProperties
 local getXY = lib_functions.getXY
+local hasBit = lib_functions.hasBit
+local setBit = lib_functions.setBit
+local clearBit = lib_functions.clearBit
 local physicsKeys = {radius = true, isSensor = true, bounce = true, friction = true, density = true, shape = true}
+
+local flipX = tonumber("80000000", 16)
+local flipY = tonumber("40000000", 16)
 
 --------------------------------------------------------------------------------
 -- Create Layer
@@ -69,12 +75,17 @@ function tilelayer.createLayer(mapData, data, dataIndex, tileIndex, imageSheets,
 			local id = ((y - 1) * mapData.width) + x
 			local gid = data.data[id]
 
-			tprint.assert(gid <= mapData.highestGID and gid >= 0, "Invalid GID at position [" .. x .. "," .. y .."] (index #" .. id ..") - expected [0 <= GID <= " .. mapData.highestGID .. "] but got " .. gid .. " instead.")
+			--tprint.assert(gid <= mapData.highestGID and gid >= 0, "Invalid GID at position [" .. x .. "," .. y .."] (index #" .. id ..") - expected [0 <= GID <= " .. mapData.highestGID .. "] but got " .. gid .. " instead.")
 			if gid == 0 then return true end -- Don't draw if the GID is 0 (signifying an empty tile)
 
 			--------------------------------------------------------------------------
 			-- Create Tile
 			--------------------------------------------------------------------------
+			local flippedX = false
+			local flippedY = false
+			if hasBit(gid, flipX) then flippedX = true gid = clearBit(gid, flipX) end
+			if hasBit(gid, flipY) then flippedY = true gid = clearBit(gid, flipY) end
+
 			local tileData = tileIndex[gid]
 			local sheetIndex = tileData.tilesetIndex
 			local tileGID = tileData.gid
@@ -84,6 +95,9 @@ function tilelayer.createLayer(mapData, data, dataIndex, tileIndex, imageSheets,
 				tile.x, tile.y = mapData.stats.tileWidth * (x - 0.5), mapData.stats.tileHeight * (y - 0.5)
 				tile.xScale, tile.yScale = screen.zoomX, screen.zoomY
 
+				if flippedX then tile.xScale = -tile.xScale end
+				if flippedY then tile.yScale = -tile.yScale end
+
 			local tileProps
 
 			if tileProperties[sheetIndex][tileGID] then
@@ -92,6 +106,10 @@ function tilelayer.createLayer(mapData, data, dataIndex, tileIndex, imageSheets,
 				tileProps = {options={nodot={},usedot={}},physics={},object={},props={}}
 			end
 
+			--------------------------------------------------------------------------
+			-- Check for Flipped
+			--------------------------------------------------------------------------
+			
 			--------------------------------------------------------------------------
 			-- Add Physics to Tile
 			--------------------------------------------------------------------------

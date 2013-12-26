@@ -46,6 +46,12 @@ local function reverseTable(t) local new = {} for i = 1, #t do new[#t - (i - 1)]
 local function addProperties(props, propName, obj) for k, v in pairs(props[propName]) do if (lib_settings.get("dotImpliesTable") or props.options.usedot[k]) and not props.options.nodot[k] then dot(obj, k, v) else obj[k] = v end end end
 -- Get directory
 local function getDirectory(dirTree, path) local path = path local numDirs = #dirTree local _i = 1 while path:sub(_i, _i + 2) == "../" do _i = _i + 3 numDirs = numDirs - 1 end local filename = path:sub(_i) local dirPath = table_concat(dirTree, "/", 1, numDirs) return dirPath, filename end
+-- Has bit
+local function hasBit(x, p) return x % (p + p) >= p end
+-- Set bit
+local function setBit(x, p) return hasbit(x, p) and x or x + p end
+-- Clear bit
+local function clearBit(x, p) return x - p end
 
 --------------------------------------------------------------------------------
 -- Get Properties
@@ -71,10 +77,10 @@ local function getProperties(data, objPrefix, isLayer)
 		local dotMode = "default"
 		if key:match("^!nodot!") then
 			key = key:sub((lib_settings.get("spaceAfterEscapedPrefix") and 9) or 8)
-			dotMode = "forced-off"
+			dotMode = "0"
 		elseif key:match("^!dot!") then
 			key = key:sub((lib_settings.get("spaceAfterEscapedPrefix") and 7) or 6)
-			dotMode = "forced-on"
+			dotMode = "1"
 		end
 
 		if key:match("^physics:") then
@@ -113,7 +119,7 @@ local function getProperties(data, objPrefix, isLayer)
 				p.options.physicsExistent = false
 			end
 		else
-			if dotMode == "forced-on" then p.options.usedot[k] = true elseif dotMode == "forced-off" then p.options.nodot[k] = true end
+			if dotMode == "1" then p.options.usedot[k] = true elseif dotMode == "0" then p.options.nodot[k] = true end
 			insertionTable[k] = v
 		end
 	end
@@ -143,5 +149,8 @@ functions.reverseTable = reverseTable
 functions.addProperties = addProperties
 functions.getProperties = getProperties
 functions.getDirectory = getDirectory
+functions.hasBit = hasBit
+functions.setBit = setBit
+functions.clearBit = clearBit
 
 return functions
